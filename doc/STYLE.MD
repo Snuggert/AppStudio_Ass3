@@ -21,27 +21,27 @@ Databases:
 ## Style
 Because i work a lot with python i tend to stick to the style guide i use with python whilst programming in other languages. The styleguide is PEP8. The rules can be read here: http://legacy.python.org/dev/peps/pep-0008/
 
-    Comments
-    -------------
-    Comments van één regel worden als volgt gedaan:
-    ```
-    /* Dit is een comment. */
-    ```
-    Comments van meerdere regels worden anders gedaan:
-    ```
-    /*
-     * Dit is een comment.
-     * Met meerdere regels.
-     */
-    ```
-    Braces
-    -------------
-    Braces worden geopend op dezelfde line en gesloten op een new line.
-    ```
-    int voorbeeld(int a){
-        return a;
-    }
-    ```
+Comments
+-------------
+Comments van één regel worden als volgt gedaan:
+```
+/* Dit is een comment. */
+```
+Comments van meerdere regels worden anders gedaan:
+```
+/*
+ * Dit is een comment.
+ * Met meerdere regels.
+ */
+```
+Braces
+-------------
+Braces worden geopend op dezelfde line en gesloten op een new line.
+```
+int voorbeeld(int a){
+    return a;
+}
+```
 
 ## APIS
 * SharedPreferences API
