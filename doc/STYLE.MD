@@ -18,11 +18,11 @@ Databases:
 -------------
 *  SharedPreferences API to support recent destinations saving.
 
-## Style
+# Style
 Because i work a lot with python i tend to stick to the style guide i use with python whilst programming in other languages. The styleguide is PEP8. The rules can be read here: http://legacy.python.org/dev/peps/pep-0008/
 
 Comments
--------------
+--------
 Comments van één regel worden als volgt gedaan:
 ```
 /* Dit is een comment. */
@@ -35,10 +35,27 @@ Comments van meerdere regels worden anders gedaan:
  */
 ```
 Braces
--------------
+------
 Braces worden geopend op dezelfde line en gesloten op een new line.
 ```
 int voorbeeld(int a){
+    return a;
+}
+```
+
+Linebreaking
+------------
+When a line continues past the 80 character line, break off like this.
+```
+int voorbeeld(int a, int b, int c,
+              int d){
+    return a;
+}
+```
+or if impossible/ugly double indent.
+```
+int voorbeeld(int a, int b, int c,
+        int d){
     return a;
 }
 ```
