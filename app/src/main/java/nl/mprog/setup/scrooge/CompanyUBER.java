@@ -1,5 +1,7 @@
 package nl.mprog.setup.scrooge;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by TheAbe on 15-Oct-14.
  */
@@ -11,4 +13,10 @@ public class CompanyUBER extends TaxiCompany {
     public CompanyUBER(){
         this.name = "UBER";
     }
+
+    @Override
+    public String getRidePrice(LatLng Start, LatLng End){
+        return "Anus";
+    }
+
 }
