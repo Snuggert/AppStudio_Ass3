@@ -11,4 +11,5 @@ public class TaxiCompany {
     public String getRidePrice(LatLng Start, LatLng End){
         return new String();
     }
+
 }
