@@ -3,5 +3,8 @@
 
     <string name="app_name">Scrooge</string>
     <string name="title_activity_main">Scrooge</string>
+    <string name="destination">Check\nPrices</string>
+    <string name="gps">On/Off\nGPS</string>
+    <string name="latitude_longitude">LAT:LONG</string>
 
 </resources>
