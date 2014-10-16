@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,5 +27,9 @@ public class ComparisonActivity extends Activity {
         startLng = mIntent.getDoubleExtra("startLng", 0.0);
         endLat = mIntent.getDoubleExtra("endLat", 0.0);
         endLng = mIntent.getDoubleExtra("endLng", 0.0);
+
+        taxiCompanies.get(0).getRidePrice(new LatLng(startLat, startLng),
+                                          new LatLng(endLat, endLng),
+                                          this);
     }
 }

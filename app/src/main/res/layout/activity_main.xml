@@ -34,14 +34,15 @@
         android:background="@color/semiblack">
 
         <Button
-            android:id="@+id/radioPopular"
+            android:id="@+id/compareStart"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/destination"
             android:gravity="center_horizontal|center_vertical"
             android:layout_weight="1"
             android:button="@null"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:onClick="startCompare"/>
         <View
             android:id="@+id/VerticalLine1"
             android:layout_width="1dip"

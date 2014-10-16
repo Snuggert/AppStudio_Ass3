@@ -1,5 +1,6 @@
 package nl.mprog.setup.scrooge;
 
+import android.content.Intent;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ public class MainActivity extends FragmentActivity implements
 
     /* Define an object that holds accuracy and frequency parameters. */
     LocationRequest mLocationRequest;
+    LatLng startPos, endPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +63,9 @@ public class MainActivity extends FragmentActivity implements
         Button gpsButton = (Button) findViewById(R.id.GPS);
         gpsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                if(mLocationClient.isConnected()){
+                if (mLocationClient.isConnected()) {
                     mLocationClient.disconnect();
-                }else{
+                } else {
                     mLocationClient.connect();
                 }
             }
@@ -126,12 +128,13 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
+        startPos = new LatLng(location.getLatitude(),
+                              location.getLongitude());
         /* Reset MarkerPosition */
         if(ownPosMarker != null)
             ownPosMarker.remove();
         ownPosMarker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(location.getLatitude(),
-                                     location.getLongitude()))
+                .position(startPos)
                 .title("Your Position")
                 .icon(BitmapDescriptorFactory.defaultMarker(
                         BitmapDescriptorFactory.HUE_BLUE)));
@@ -145,6 +148,7 @@ public class MainActivity extends FragmentActivity implements
                 .title("Destination")
                 .icon(BitmapDescriptorFactory.defaultMarker(
                         BitmapDescriptorFactory.HUE_RED)));
+        endPos = point;
     }
 
     private void setUpMapIfNeeded() {
@@ -161,6 +165,17 @@ public class MainActivity extends FragmentActivity implements
             if (mMap != null) {
                 mMap.setOnMapLongClickListener(this);
             }
+        }
+    }
+
+    public void startCompare(View view){
+        if(startPos != null && endPos != null){
+            Intent compareIntent = new Intent(this, ComparisonActivity.class);
+            compareIntent.putExtra("startLat", startPos.latitude);
+            compareIntent.putExtra("startLng", startPos.longitude);
+            compareIntent.putExtra("endLat", endPos.latitude);
+            compareIntent.putExtra("endLng", endPos.longitude);
+            startActivity(compareIntent);
         }
     }
 }
