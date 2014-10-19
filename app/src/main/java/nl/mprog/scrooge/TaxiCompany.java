@@ -1,4 +1,4 @@
-package nl.mprog.setup.scrooge;
+package nl.mprog.scrooge;
 
 import android.content.Context;
 

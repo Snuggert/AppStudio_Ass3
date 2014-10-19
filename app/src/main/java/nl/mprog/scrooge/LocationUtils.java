@@ -1,4 +1,4 @@
-package nl.mprog.setup.scrooge;
+package nl.mprog.scrooge;
 
 /*
  * Copyright (C) 2013 The Android Open Source Project
@@ -18,6 +18,8 @@ package nl.mprog.setup.scrooge;
 
 import android.content.Context;
 import android.location.Location;
+
+import nl.mprog.setup.scrooge.R;
 
 /**
  * Defines app-wide constants and utilities

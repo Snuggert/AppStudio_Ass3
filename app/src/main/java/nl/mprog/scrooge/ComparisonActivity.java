@@ -1,4 +1,4 @@
-package nl.mprog.setup.scrooge;
+package nl.mprog.scrooge;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,8 +7,8 @@ import android.os.Bundle;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import nl.mprog.setup.scrooge.R;
 
 
 public class ComparisonActivity extends Activity {
@@ -20,7 +20,7 @@ public class ComparisonActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comparison);
 
-        taxiCompanies.add(new CompanyUBER());
+        taxiCompanies.add(new TaxiCompanyUBER());
 
         Intent mIntent = getIntent();
         startLat = mIntent.getDoubleExtra("startLat", 0.0);

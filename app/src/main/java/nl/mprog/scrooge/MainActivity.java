@@ -1,4 +1,4 @@
-package nl.mprog.setup.scrooge;
+package nl.mprog.scrooge;
 
 import android.content.Intent;
 import android.location.Location;
@@ -18,6 +18,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import nl.mprog.setup.scrooge.R;
 
 public class MainActivity extends FragmentActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
@@ -56,7 +58,8 @@ public class MainActivity extends FragmentActivity implements
 
         /*
          * Create a new location client, using the enclosing class to
-         * handle callbacks.
+         * handle callbacks. mLocationClient needs the services:
+         * ConnectionCallback, onConnectionFailedListener, onMapclickListener.
          */
         mLocationClient = new LocationClient(this, this, this);
 
@@ -74,17 +77,13 @@ public class MainActivity extends FragmentActivity implements
 
     /*
      * Called when the Activity is no longer visible at all.
-     * Stop updates and disconnect.
+     * Stop updates and disconnect. After this the app is dead.
      */
     @Override
     public void onStop() {
         if (mLocationClient.isConnected()) {
             mLocationClient.removeLocationUpdates(this);
         }
-        /*
-         * After disconnect() is called, the client is
-         * considered "dead".
-         */
         mLocationClient.disconnect();
         super.onStop();
     }
@@ -104,9 +103,9 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onStart() {
         super.onStart();
-        /*
-         * Connect the client. Don't re-start any requests here;
-         * instead, wait for onResume()
+        /**
+         * reconnect the gps-client, this will be updated to use the
+         * sharedpreferences to remember state.
          */
         mLocationClient.connect();
     }
@@ -121,6 +120,8 @@ public class MainActivity extends FragmentActivity implements
     public void onConnected(Bundle dataBundle) {
         mLocationClient.requestLocationUpdates(mLocationRequest, this);
     }
+
+    /**  These functions need to be overriden to use the Locationclient.*/
     @Override
     public void onDisconnected() {}
     @Override
@@ -168,7 +169,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    public void startCompare(View view){
+    private void startCompare(View view){
         if(startPos != null && endPos != null){
             Intent compareIntent = new Intent(this, ComparisonActivity.class);
             compareIntent.putExtra("startLat", startPos.latitude);
