@@ -28,6 +28,7 @@ public class MainActivity extends FragmentActivity implements
     /* Might be null if Google Play services APK is not available. */
     private GoogleMap mMap;
     private Marker ownPosMarker;
+    private Marker longClickMarker;
 
     /* Stores the current instantiation of the location client in this object */
     private LocationClient mLocationClient;
@@ -144,11 +145,13 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onMapLongClick(LatLng point) {
-        mMap.addMarker(new MarkerOptions()
-                .position(point)
-                .title("Destination")
-                .icon(BitmapDescriptorFactory.defaultMarker(
-                        BitmapDescriptorFactory.HUE_RED)));
+        if(longClickMarker != null)
+            longClickMarker.remove();
+        longClickMarker = mMap.addMarker(new MarkerOptions()
+                              .position(point)
+                              .title("Destination")
+                              .icon(BitmapDescriptorFactory.defaultMarker(
+                                    BitmapDescriptorFactory.HUE_RED)));
         endPos = point;
     }
 
@@ -169,7 +172,11 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    private void startCompare(View view){
+    /*
+     * Public startCompare that is called by the onclick event bound to the
+     * checkprices button.
+     */
+    public void startCompare(View view){
         if(startPos != null && endPos != null){
             Intent compareIntent = new Intent(this, ComparisonActivity.class);
             compareIntent.putExtra("startLat", startPos.latitude);

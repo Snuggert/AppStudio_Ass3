@@ -4,14 +4,13 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonParser;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-/**
- * Created by TheAbe on 15-Oct-14.
- */
 public class TaxiCompanyUBER extends TaxiCompany {
     private final String uberUrl = "https://api.uber.com/v1/estimates/price";
     private final String serverToken =
@@ -22,30 +21,56 @@ public class TaxiCompanyUBER extends TaxiCompany {
     }
 
     @Override
-    public String getRidePrice(LatLng Start, LatLng End, Context context){
-        final Context finalContext = context;
+    public void getRidePrice(LatLng start, LatLng end, Context context) {
+        final ComparisonActivity comparisonContext = (ComparisonActivity) context;
 
         String getRequest = "?server_token=" + serverToken + "&"
-                          + "start_latitude=" + Start.latitude + "&"
-                          + "start_longitude=" + Start.longitude + "&"
-                          + "end_latitude=" + End.latitude + "&"
-                          + "end_longitude=" + End.longitude;
+                + "start_latitude=" + start.latitude + "&"
+                + "start_longitude=" + start.longitude + "&"
+                + "end_latitude=" + end.latitude + "&"
+                + "end_longitude=" + end.longitude;
+
+        JsonArray resultArray = new JsonArray();
 
         Ion.with(context).load("GET", uberUrl + getRequest)
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if(e != null)
-                            // do stuff with the result or error
-                            Toast.makeText(finalContext, e.toString(),
-                                           Toast.LENGTH_SHORT).show();
-                        if(!result.isJsonNull())
-                            Log.v("InternetShizzle", result.toString());
-                        Log.v("InternetShizzle", "Klaar");
+            .asJsonObject()
+            .setCallback(new FutureCallback<JsonObject>() {
+                @Override
+                public void onCompleted(Exception e, JsonObject result) {
+                    if (e != null)
+                        // do stuff with the result or error
+                        Log.v("IonError", e.toString());
+                    else if (!result.isJsonNull()) {
+                    /*
+                     * Put result into JsonArray, because this is what
+                     * UBER returns.
+                     */
+                    JsonArray resultArray = result.getAsJsonArray("prices");
+
+                    /*
+                     * Iterate over the prices given by UBER.
+                     */
+                        for (int index = 0; index < resultArray.size();
+                             index++) {
+                            comparisonContext.setNewItem(
+                                    jsonToGrid(resultArray.get(index)
+                                            .getAsJsonObject()));
+                        }
+
                     }
-                });
-        return "Still Testing";
+                }
+            });
     }
 
+    /*
+     * Function to read a UBER specific json file into a GridData object.
+     */
+    private GridData jsonToGrid(JsonObject object){
+        return new GridData(
+        /* To lowercase for usage of drawable name */
+                object.getAsJsonPrimitive("display_name").getAsString()
+                        .toLowerCase(),
+                object.getAsJsonPrimitive("estimate").getAsString()
+        );
+    }
 }

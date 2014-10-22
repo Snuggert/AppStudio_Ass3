@@ -10,8 +10,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class TaxiCompany {
     public static String name;
 
-    public String getRidePrice(LatLng Start, LatLng End, Context context){
-        return new String();
+    public void getRidePrice(LatLng Start, LatLng End, Context context){
     }
 
 }
