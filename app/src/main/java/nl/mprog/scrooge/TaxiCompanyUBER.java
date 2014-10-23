@@ -41,20 +41,20 @@ public class TaxiCompanyUBER extends TaxiCompany {
                         // do stuff with the result or error
                         Log.v("IonError", e.toString());
                     else if (!result.isJsonNull()) {
-                    /*
-                     * Put result into JsonArray, because this is what
-                     * UBER returns.
-                     */
-                    JsonArray resultArray = result.getAsJsonArray("prices");
+                        /*
+                         * Put result into JsonArray, because this is what
+                         * UBER returns.
+                         */
+                        JsonArray resultArray = result.getAsJsonArray("prices");
 
-                    /*
-                     * Iterate over the prices given by UBER.
-                     */
+                        /*
+                         * Iterate over the prices given by UBER.
+                         */
                         for (int index = 0; index < resultArray.size();
-                             index++) {
-                            comparisonContext.setNewItem(
-                                    jsonToGrid(resultArray.get(index)
-                                            .getAsJsonObject()));
+                        index++) {
+                        comparisonContext.setNewItem(
+                            jsonToGrid(resultArray.get(index)
+                                    .getAsJsonObject()));
                         }
 
                     }
@@ -68,8 +68,7 @@ public class TaxiCompanyUBER extends TaxiCompany {
     private GridData jsonToGrid(JsonObject object){
         return new GridData(
         /* To lowercase for usage of drawable name */
-                object.getAsJsonPrimitive("display_name").getAsString()
-                        .toLowerCase(),
+                object.getAsJsonPrimitive("display_name").getAsString(),
                 object.getAsJsonPrimitive("estimate").getAsString()
         );
     }

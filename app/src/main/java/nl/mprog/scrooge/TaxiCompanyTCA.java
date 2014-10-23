@@ -4,34 +4,27 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import org.apache.http.protocol.HTTP;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TaxiCompanyTCA extends TaxiCompany  {
     final String DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
     final String googleDistanceUrl =
             "http://maps.googleapis.com/maps/api/distancematrix/json";
-    final String tcaUrl = "http://m.taxi4me.net/mobile/account.js";
-
-    String googleKey = "AIzaSyDw-o5FTrOWURz0mZpSyzyFCxpGpINkeYk";
-    String googleRegion = "nl";
+    final String tcaUrlOne = "http://m.taxi4me.net/mobile/account.js";
+    final String tcaUrlTwo = "http://m.taxi4me.net/mobile/sofortantwort.js";
 
     public TaxiCompanyTCA(){
         this.name = "TCA";
@@ -39,28 +32,64 @@ public class TaxiCompanyTCA extends TaxiCompany  {
 
     @Override
     public void getRidePrice(LatLng start, LatLng end, Context context) {
-        Ion.with(context)
-                .load("GET", tcaUrl + buildRequest(start, end,
-                      context))
-                .setHandler(null)
-                .asString()
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result) {
-                        if (e != null)
-                            // do stuff with the result or error
-                            Log.v("IonError", e.toString());
-                        else if (result != null) {
-                            Log.v("IonSucces", result);
-                        }
-                    }
-                });
-    }
-
-    private String buildRequest(LatLng start, LatLng end, Context context){
         final ComparisonActivity comparisonContext =
                 (ComparisonActivity) context;
 
+        String getRequest = buildRequest(start, end, context);
+        String TCAReturnOne = null;
+        String TCAReturnTwo = null;
+
+        final String accountPattern = "MBACCOUNT: \\'(.+?)\\'";
+        final String sessionPattern = "setSessionId\\(\\'(.*)\\'\\)";
+
+        final String preisPattern = "\\\"preis\\_betrag\\\"\\: \\\"(.*)\\\"\\,";
+
+        try{
+            TCAReturnOne = Ion.with(context)
+                                     .load("GET", tcaUrlOne + getRequest)
+                                     .setHandler(null)
+                                     .asString()
+                                     .get();
+        }catch(java.lang.InterruptedException e){
+            Log.v("routeError", e.toString());
+        }catch(ExecutionException e){
+            Log.v("routeError", e.toString());
+        }
+        if(TCAReturnOne != null){
+            Pattern p = Pattern.compile(accountPattern);
+            Matcher m = p.matcher(TCAReturnOne); // get a matcher object
+            if(m.find()) {
+                getRequest = getRequest + "&mbaccount=" +  m.group(1);
+            }
+            p = Pattern.compile(sessionPattern);
+            m = p.matcher(TCAReturnOne);
+            if(m.find()) {
+                getRequest = getRequest + "&sessionid=" +  m.group(1);
+            }
+
+            try{
+                TCAReturnTwo = Ion.with(context)
+                        .load("GET", tcaUrlTwo + getRequest)
+                        .setHandler(null)
+                        .asString()
+                        .get();
+            }catch(java.lang.InterruptedException e){
+                Log.v("routeError", e.toString());
+            }catch(ExecutionException e){
+                Log.v("routeError", e.toString());
+            }
+            if(TCAReturnTwo != null){
+                p = Pattern.compile(preisPattern);
+                m = p.matcher(TCAReturnTwo);
+                if(m.find()){
+                    comparisonContext.setNewItem(
+                            new GridData(name, "€" + m.group(1)));
+                }
+            }
+        }
+    }
+
+    private String buildRequest(LatLng start, LatLng end, Context context){
         Address startAddress = geoLocation(start, context);
         Address endAddress = geoLocation(end, context);
 
@@ -74,14 +103,14 @@ public class TaxiCompanyTCA extends TaxiCompany  {
 
         String getRequest = "?acc_action=" + "get&"
                 + "acc_fromdevice=" + 1 + "&"
-                + "deviceid=" + "You guys write terrible apis&"
-                + "version=" + "3.48 (11.01.2012 14+47)&"
+                + "deviceid=" + Uri.encode("You guys write terrible apis") + "&"
+                + "version=" + Uri.encode("3.48 (11.01.2012 14+47)") + "&"
                 + "platform=" + "ANDROID&"
                 + "zentralen_kuerzel=" + 7777 + "&"
                 + "sprachcode="+ "nl"+ "&"
                 + "maporder="+ 1 + "&"
                 + "termin=" + "sofort" + "&"
-                + "_=" + GetUTCdatetimeAsString() + "&"
+                + "_=" + Uri.encode(GetUTCdatetimeAsString()) + "&"
                 + "strecke=" + route
                     .getAsJsonObject("distance")
                     .getAsJsonPrimitive("value")
@@ -94,27 +123,26 @@ public class TaxiCompanyTCA extends TaxiCompany  {
                 + "A.gpsadr_y=" + start.latitude + "&"
                 + "A.gpsadr_x=" + start.longitude + "&"
                 + "A.ort_ortname=" + startAddress.getLocality() + "&"
-                + "A.strasse=" + startAddress.getThoroughfare() + "&"
-                + "A.hausnummer_ecke=" + startAddress
-                    .getAddressLine(0) + "&"
+                + "A.strasse=" + Uri.encode(startAddress.getThoroughfare()) + "&"
+                + "A.hausnummer_ecke=" + Uri.encode(startAddress
+                    .getAddressLine(0)) + "&"
                 + "A.staat=" + "NL" + "&"
-                + "A.plz=" + startAddress.getPostalCode() + "&"
+                + "A.plz=" + Uri.encode(startAddress.getPostalCode()) + "&"
                 + "Z.setzen=" + 1 + "&"
                 + "Z.fix=" + 0 + "&"
                 + "Z.gpsadr_y=" + end.latitude + "&"
                 + "Z.gpsadr_x="+ end.longitude + "&"
-                + "Z.ort_ortname=" + endAddress.getLocality() + "&"
-                + "Z.strasse=" + endAddress.getThoroughfare() + "&"
-                + "Z.plz=" + endAddress.getPostalCode() + "&"
+                + "Z.ort_ortname=" + Uri.encode(endAddress.getLocality()) + "&"
+                + "Z.strasse=" + Uri.encode(endAddress.getThoroughfare()) + "&"
+                + "Z.plz=" + Uri.encode(endAddress.getPostalCode()) + "&"
                 + "Z.staat=" + "NL" + "&"
-                + "Z.hausnummer_ecke=" + endAddress
-                    .getAddressLine(0) + "&"
+                + "Z.hausnummer_ecke=" + Uri.encode(endAddress
+                    .getAddressLine(0)) + "&"
                 + "fld_merkal=" + 144 + "&"
                 + "afart=" + 1 + "&"
                 + "afart_alt=" + 1 + "&"
                 + "nur_fahrpreis=" + 1;
 
-        Log.v("Request", getRequest);
         return getRequest;
     }
 

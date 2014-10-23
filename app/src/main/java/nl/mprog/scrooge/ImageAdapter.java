@@ -47,7 +47,7 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return (long) position;
     }
 
     /* Create a new ImageView for each item referenced by the Adapter. */
@@ -70,7 +70,8 @@ public class ImageAdapter extends BaseAdapter {
 
             ImageView imageView = (ImageView) gridView
                     .findViewById(R.id.grid_item_image);
-            String viewImage = "@drawable/" + dataArray.get(position).Name.toString();
+            String viewImage = "@drawable/" +
+                    dataArray.get(position).Name.toLowerCase();
             int imageResource = mContext.getResources().getIdentifier(
                     viewImage, null, mContext.getPackageName());
 
